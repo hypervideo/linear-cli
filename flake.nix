@@ -6,32 +6,40 @@
 
   outputs = { self, nixpkgs, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system:
-      let pkgs = import nixpkgs { inherit system; };
+      let
+        pkgs = import nixpkgs { inherit system; };
+        lr = pkgs.rustPlatform.buildRustPackage {
+          name = "lr";
+          src = ./.;
+          cargoHash = "sha256-+wyAx/ZBJs/kCQ0JQYpOIUNPFI9yaYzT7zkhzayhIPM=";
+        };
       in
-        {
-          devShells.default = pkgs.mkShell {
-            nativeBuildInputs = with pkgs; [
-              rustc
-              cargo
-              clippy
-              pkg-config
-              graphql-client
-            ];
+      {
+        packages = { inherit lr; };
 
-            buildInputs = with pkgs; [
-              openssl
-              clang
-            ] ++ (if pkgs.stdenv.isDarwin then [ libiconv ] else [ ]);
+        devShells.default = pkgs.mkShell {
+          nativeBuildInputs = with pkgs; [
+            rustc
+            cargo
+            clippy
+            pkg-config
+            graphql-client
+          ];
 
-            packages = with pkgs; [
-              rust-analyzer
-              rustfmt
-            ];
+          buildInputs = with pkgs; [
+            openssl
+            clang
+          ] ++ (if pkgs.stdenv.isDarwin then [ libiconv ] else [ ]);
 
-            RUST_BACKTRACE = "1";
-            RUST_LOG = "info,lr=debug";
-            LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
-          };
-        }
+          packages = with pkgs; [
+            rust-analyzer
+            rustfmt
+          ];
+
+          RUST_BACKTRACE = "1";
+          RUST_LOG = "info,lr=debug";
+          LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
+        };
+      }
     );
 }
