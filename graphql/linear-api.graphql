@@ -1,3 +1,5 @@
+# https://studio.apollographql.com/public/Linear-API/variant/current/schema/sdl?selectedSchema=%23%40%21api%21%40%23
+
 type AuthApiKey {
   """The unique identifier of the entity."""
   id: ID!

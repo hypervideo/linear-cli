@@ -11,7 +11,7 @@
         lr = pkgs.rustPlatform.buildRustPackage {
           name = "lr";
           src = ./.;
-          cargoHash = "sha256-+wyAx/ZBJs/kCQ0JQYpOIUNPFI9yaYzT7zkhzayhIPM=";
+          cargoHash = "sha256-RCNjt24Egs5FQkJO4sODe9alycL2wVSyIABGMGb03FU=";
         };
       in
       {
