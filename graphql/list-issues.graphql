@@ -1,0 +1,76 @@
+# query ListIssues {
+#   issues {
+#     nodes { id title }
+#   }
+# }
+
+query ListIssues(
+  $after: String
+  $before: String
+  $first: Int
+  $includeArchived: Boolean
+  $last: Int
+  $orderBy: PaginationOrderBy
+) {
+  issues(
+    after: $after
+    before: $before
+    first: $first
+    includeArchived: $includeArchived
+    last: $last
+    orderBy: $orderBy
+  ) {
+    ...IssueConnection
+  }
+}
+
+fragment IssueConnection on IssueConnection {
+  edges {
+    node {
+      ...Issue
+    }
+    cursor
+  }
+  pageInfo {
+    hasNextPage
+    endCursor
+  }
+}
+
+fragment Issue on Issue {
+  url
+  identifier
+  title
+  createdAt
+  updatedAt
+  parent {
+    id
+  }
+  priority
+  priorityLabel
+  project {
+    id
+  }
+  team {
+    id
+    key
+  }
+  id
+  assignee {
+    id
+    displayName
+  }
+  state {
+    id
+    name
+    color
+    type
+  }
+  labels {
+    nodes {
+      id
+      name
+      color
+    }
+  }
+}
