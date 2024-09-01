@@ -4,9 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+bon = "2.1.0"
 chrono = { version = "0.4.38", features = ["serde"] }
 clap = { version = "4.5.16", features = ["derive", "env"] }
 color-eyre = "0.6.3"
+comfy-table = "7.1.1"
 eyre = "0.6.12"
 graphql_client = { version = "0.14.0", features = ["reqwest"] }
 reqwest = { version = "0.12.7", features = ["json"] }

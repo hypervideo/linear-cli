@@ -4,7 +4,11 @@ mod requests;
 #[macro_use]
 extern crate tracing;
 
+#[macro_use]
+extern crate bon;
+
 use clap::Parser;
+use requests::*;
 
 #[derive(Parser)]
 struct Args {
@@ -23,8 +27,8 @@ enum Cmd {
 
 #[derive(Parser)]
 struct List {
-    // #[clap(long, env = "LINEAR_TEAM_ID")]
-    // team_id: String,
+    #[clap(short, long, default_value = "10")]
+    n: Option<usize>,
 }
 
 #[tokio::main]
@@ -40,15 +44,11 @@ async fn run(args: Args) -> color_eyre::Result<()> {
 
     match args.subcmd {
         Cmd::Me => {
-            let me = requests::me(&client).await?;
-            println!("{}", serde_json::to_string_pretty(&me)?);
+            me::print(me::request(&client).await);
         }
 
-        Cmd::List(_) => {
-            let issues = requests::list_issues(&client).await?;
-            for issue in issues {
-                println!("{}", serde_json::to_string_pretty(&issue)?);
-            }
+        Cmd::List(List { n }) => {
+            list_issues::print(list_issues::request().client(&client).maybe_n(n).call().await);
         }
     }
 
