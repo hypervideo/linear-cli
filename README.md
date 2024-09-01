@@ -21,6 +21,18 @@ Options:
   -h, --help               Print help
 ```
 
+### Command: init
+
+```
+Initialize the configuration of `lr`. Will prompt for the API key and write $XDG_CONFIG_HOME/linear-cli/config.toml
+
+Usage: lr init
+
+Options:
+  -h, --help  Print help
+```
+
+
 ### Command: me
 
 ```

@@ -38,6 +38,8 @@ impl Args {
 enum Cmd {
     Me(Me),
     List(List),
+    /// Initialize the configuration of `lr`. Will prompt for the API key and
+    /// write $XDG_CONFIG_HOME/linear-cli/config.toml.
     Init,
 }
 
