@@ -34,12 +34,14 @@ enum Cmd {
     List(List),
 }
 
+/// Show information about the authenticated user.
 #[derive(Parser)]
 struct Me {
     #[clap(long, action, default_value = "false")]
     json: bool,
 }
 
+/// List issues.
 #[derive(Parser)]
 struct List {
     #[clap(short, long, default_value = "10")]
