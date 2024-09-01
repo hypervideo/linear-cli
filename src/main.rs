@@ -13,6 +13,7 @@ use clap::Parser;
 use eyre::{Context as _, ContextCompat as _, Result};
 use requests::*;
 use serde::{Deserialize, Serialize};
+use strum::IntoEnumIterator;
 
 #[derive(Parser)]
 struct Args {
@@ -50,11 +51,26 @@ struct Me {
 /// List issues.
 #[derive(Parser)]
 struct List {
-    #[clap(short, long, default_value = "10")]
+    #[clap(short, long = "limit")]
     n: Option<usize>,
+
+    #[clap(short, long, default_value = "created")]
+    sort_by: list_issues::SortBy,
+
+    #[clap(short, long)]
+    assignee: Option<String>,
+
+    #[clap(long, value_delimiter = ',')]
+    state: Option<Vec<list_issues::IssueState>>,
+
+    #[clap(long, value_delimiter = ',')]
+    not_state: Option<Vec<list_issues::IssueState>>,
 
     #[clap(long, action, default_value = "false")]
     json: bool,
+
+    #[clap(long, action, default_value = "false")]
+    full_width: bool,
 }
 
 #[derive(Default, Deserialize, Serialize)]
@@ -120,8 +136,38 @@ async fn run(args: Args) -> color_eyre::Result<()> {
             me::print(me::request(&client).await, json);
         }
 
-        Cmd::List(List { n, json }) => {
-            list_issues::print(list_issues::request().client(&client).maybe_n(n).call().await, json);
+        Cmd::List(List {
+            n,
+            assignee,
+            sort_by,
+            state,
+            not_state,
+            json,
+            full_width,
+        }) => {
+            let state = match (state, not_state) {
+                (None, None) => None,
+                (state @ Some(_), None) => state,
+                (None, Some(not_state)) => Some(
+                    list_issues::IssueState::iter()
+                        .filter(|s| !not_state.contains(s))
+                        .collect(),
+                ),
+                (Some(state), Some(not_state)) => Some(state.into_iter().filter(|s| !not_state.contains(s)).collect()),
+            };
+
+            list_issues::print(
+                list_issues::request()
+                    .client(&client)
+                    .maybe_n(n)
+                    .sort_by(sort_by)
+                    .maybe_assignee(assignee)
+                    .maybe_state(state)
+                    .call()
+                    .await,
+                json,
+                full_width,
+            );
         }
 
         Cmd::Init => {

@@ -29,7 +29,7 @@ Show information about the authenticated user
 Usage: lr --api-key <API_KEY> me [OPTIONS]
 
 Options:
-      --json  
+      --json
   -h, --help  Print help
 ```
 
@@ -38,10 +38,23 @@ Options:
 ```
 List issues
 
-Usage: lr --api-key <API_KEY> list [OPTIONS]
+Usage: lr list [OPTIONS]
 
 Options:
-  -n, --n <N>  [default: 10]
-      --json   
-  -h, --help   Print help
+  -n, --limit <N>
+  -s, --sort-by <SORT_BY>      [default: created] [possible values: created, updated]
+  -a, --assignee <ASSIGNEE>
+      --state <STATE>          [possible values: started, unstarted, backlog, completed, canceled]
+      --not-state <NOT_STATE>  [possible values: started, unstarted, backlog, completed, canceled]
+      --json
+      --full-width
+  -h, --help                   Print help
+```
+
+#### Examples
+
+List todo items assigned to a user, sorted by updated date:
+
+```
+lr list --not-state completed,canceled --assignee robert --sort-by updated
 ```
