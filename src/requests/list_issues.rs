@@ -16,7 +16,8 @@ pub type Issue = list_issues::Issue;
 
 #[builder]
 pub async fn request(client: &Client, n: Option<usize>) -> Result<Vec<Issue>> {
-    let mut per_page = 20;
+    const PER_PAGE: usize = 20;
+    let mut per_page = n.map(|n| n.min(PER_PAGE)).unwrap_or(PER_PAGE);
     let mut i = 0;
     let mut after = None;
     let mut result = Vec::new();
@@ -57,7 +58,7 @@ pub async fn request(client: &Client, n: Option<usize>) -> Result<Vec<Issue>> {
     }
 }
 
-pub fn print(res: Result<Vec<Issue>>) {
+pub fn print(res: Result<Vec<Issue>>, json: bool) {
     use comfy_table::*;
 
     let res = match res {
@@ -68,9 +69,15 @@ pub fn print(res: Result<Vec<Issue>>) {
         }
     };
 
+    if json {
+        println!("{}", serde_json::to_string_pretty(&res).unwrap());
+        return;
+    }
+
     let mut table = Table::new();
     table.load_preset(comfy_table::presets::ASCII_BORDERS_ONLY_CONDENSED);
     table.set_content_arrangement(comfy_table::ContentArrangement::DynamicFullWidth);
+    // table.set_content_arrangement(comfy_table::ContentArrangement::Disabled);
     table.add_row([
         Cell::new("url"),
         Cell::new("id"),
@@ -78,7 +85,7 @@ pub fn print(res: Result<Vec<Issue>>) {
         Cell::new("created_at"),
         Cell::new("updated_at"),
         Cell::new("parent"),
-        Cell::new("priority_label"),
+        Cell::new("priority"),
         Cell::new("project"),
         Cell::new("assignee"),
         Cell::new("state"),
@@ -97,6 +104,7 @@ pub fn print(res: Result<Vec<Issue>>) {
             created_at,
             updated_at,
             parent,
+            priority,
             priority_label,
             project,
             assignee,
@@ -107,6 +115,7 @@ pub fn print(res: Result<Vec<Issue>>) {
 
         let state_t = state.type_;
         let state = state.name;
+        let priority = if priority == 0.0 { String::new() } else { priority_label };
 
         table.add_row([
             Cell::new(url),
@@ -115,7 +124,7 @@ pub fn print(res: Result<Vec<Issue>>) {
             Cell::new(created_at.to_string()),
             Cell::new(updated_at.to_string()),
             Cell::new(parent.map(|p| p.id).unwrap_or_default()),
-            Cell::new(priority_label),
+            Cell::new(priority),
             Cell::new(project.map(|p| p.id).unwrap_or_default()),
             Cell::new(assignee.map(|a| a.display_name).unwrap_or_default()),
             Cell::new(format!("{} - {}", state, state_t)),

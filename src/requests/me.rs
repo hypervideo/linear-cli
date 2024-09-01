@@ -16,7 +16,7 @@ pub async fn request(client: &Client) -> Result<me::MeViewer> {
     client.req::<_, me::ResponseData>(query).await.map(|r| r.viewer)
 }
 
-pub fn print(res: Result<me::MeViewer>) {
+pub fn print(res: Result<me::MeViewer>, json: bool) {
     use comfy_table::*;
 
     let res = match res {
@@ -26,6 +26,11 @@ pub fn print(res: Result<me::MeViewer>) {
             return;
         }
     };
+
+    if json {
+        println!("{}", serde_json::to_string_pretty(&res).unwrap());
+        return;
+    }
 
     let mut table = Table::new();
     table.load_preset(comfy_table::presets::ASCII_BORDERS_ONLY_CONDENSED);
