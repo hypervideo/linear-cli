@@ -1,0 +1,28 @@
+query ListWorkflowStates {
+  workflowStates {
+    ...WorkflowStateConnection
+  }
+}
+
+fragment WorkflowStateConnection on WorkflowStateConnection {
+  nodes {
+    ...WorkflowState
+  }
+}
+
+fragment WorkflowState on WorkflowState {
+  id
+  type
+  name
+  archivedAt
+  color
+  createdAt
+  description
+  position
+  updatedAt
+  team {
+    id
+    key
+    name
+  }
+}

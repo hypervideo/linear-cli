@@ -1,0 +1,13 @@
+query ListTeams {
+  teams(
+    filter: {}
+    first: 100
+) {
+    nodes {
+      description
+      name
+      key
+      id
+    }
+  }
+}

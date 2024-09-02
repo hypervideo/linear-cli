@@ -1,24 +1,9 @@
+use crate::{
+    client::Client,
+    shared::{IssueState, SortBy},
+};
 use eyre::Result;
 use graphql_client::GraphQLQuery;
-
-use crate::client::Client;
-
-#[derive(Clone, clap::ValueEnum)]
-pub enum SortBy {
-    #[clap(name = "created")]
-    CreatedAt,
-    #[clap(name = "updated")]
-    UpdatedAt,
-}
-
-#[derive(Clone, clap::ValueEnum, strum::EnumIter, PartialEq, Eq, Hash)]
-pub enum IssueState {
-    Started,
-    Unstarted,
-    Backlog,
-    Completed,
-    Canceled,
-}
 
 #[derive(GraphQLQuery)]
 #[graphql(
@@ -40,6 +25,7 @@ pub async fn request(
     state: Option<Vec<IssueState>>,
 ) -> Result<Vec<Issue>> {
     const PER_PAGE: usize = 100;
+    let per_page = n.map(|n| n.min(PER_PAGE)).unwrap_or(PER_PAGE);
     let mut i = 0;
     let mut after = None;
     let mut result = Vec::new();
@@ -50,10 +36,10 @@ pub async fn request(
     };
 
     loop {
-        debug!(page = %i, %PER_PAGE, "list_issues");
+        debug!(page = %i, %per_page, "list_issues");
 
         let query = ListIssues::build_query(list_issues::Variables {
-            first: Some(PER_PAGE as _),
+            first: Some(per_page as _),
             order_by: Some(order_by.clone()),
             after,
             before: None,
@@ -99,8 +85,10 @@ pub async fn request(
         }
 
         if let Some(n) = n {
-            if result.len() >= n {
-                break Ok(result);
+            match result.len() {
+                l if l > n => break Ok(result.into_iter().take(n).collect()),
+                l if l == n => break Ok(result),
+                _ => {}
             }
         }
 

@@ -1,9 +1,3 @@
-# query ListIssues {
-#   issues {
-#     nodes { id title }
-#   }
-# }
-
 query ListIssues(
   $after: String
   $before: String
@@ -50,15 +44,18 @@ fragment Issue on Issue {
   priorityLabel
   project {
     id
+    name
   }
   team {
     id
     key
+    name
   }
   id
   assignee {
     id
     displayName
+    email
   }
   state {
     id
@@ -72,5 +69,10 @@ fragment Issue on Issue {
       name
       color
     }
+  }
+  creator {
+    id
+    displayName
+    email
   }
 }

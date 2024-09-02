@@ -1,0 +1,19 @@
+mutation IssueUpdate(
+  $id: ID!
+  input: IssueUpdateInput!
+) {
+  issueUpdate(
+    id: $id
+    input: $input
+  ) {
+    success
+    issue {
+      id
+      title
+      state {
+        id
+        name
+      }
+    }
+  }
+}
