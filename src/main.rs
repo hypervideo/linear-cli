@@ -33,8 +33,11 @@ impl Args {
                 cmd: IssueCommand::List(IssueList { json, .. }),
             } => *json,
             Command::Issue {
-                cmd: IssueCommand::Update(IssueUpdate { json, .. }),
+                cmd: IssueCommand::Show(IssueShow { json, .. }),
             } => *json,
+            Command::Issue {
+                cmd: IssueCommand::Update(_),
+            } => false,
             Command::Team {
                 cmd: TeamCommand::List(TeamList { json, .. }),
             } => *json,
@@ -71,6 +74,7 @@ enum TeamCommand {
 
 #[derive(Parser)]
 enum IssueCommand {
+    Show(IssueShow),
     List(IssueList),
     Update(IssueUpdate),
 }
@@ -90,6 +94,19 @@ struct Me {
 /// List teams.
 #[derive(Parser)]
 struct TeamList {
+    #[clap(long, action, default_value = "false")]
+    json: bool,
+
+    #[clap(long, action, default_value = "false")]
+    full_width: bool,
+}
+
+/// Show details about a single issue.
+#[derive(Parser)]
+struct IssueShow {
+    #[clap(help = "Linear issue identifier (e.g. 'L-1234'")]
+    id: String,
+
     #[clap(long, action, default_value = "false")]
     json: bool,
 
@@ -128,14 +145,11 @@ struct IssueUpdate {
     #[clap(help = "Linear issue identifier (e.g. 'L-1234')")]
     id: String,
 
-    #[clap(short, long)]
+    #[clap(long)]
     title: Option<String>,
 
-    #[clap(short, long)]
+    #[clap(long)]
     state: Option<shared::IssueState>,
-
-    #[clap(long, action, default_value = "false")]
-    json: bool,
 }
 
 #[derive(Default, Deserialize, Serialize)]
@@ -248,9 +262,29 @@ async fn run(args: Args) -> color_eyre::Result<()> {
         }
 
         Command::Issue {
-            cmd: IssueCommand::Update(IssueUpdate { .. }),
+            cmd: IssueCommand::Show(IssueShow { id, json, full_width }),
         } => {
-            todo!()
+            requests::issue::show::print(
+                requests::issue::show::request()
+                    .client(&client)
+                    .issue_id(id)
+                    .call()
+                    .await,
+                json,
+                full_width,
+            );
+        }
+
+        Command::Issue {
+            cmd: IssueCommand::Update(IssueUpdate { id, title, state: _ }),
+        } => {
+            requests::issue::update::request()
+                .client(&client)
+                .id(id)
+                .maybe_title(title)
+                // .maybe_state(state)
+                .call()
+                .await?;
         }
 
         Command::Team {

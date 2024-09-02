@@ -7,7 +7,7 @@ use graphql_client::GraphQLQuery;
 
 #[derive(GraphQLQuery)]
 #[graphql(
-    query_path = "graphql/list-issues.graphql",
+    query_path = "graphql/issue-list.graphql",
     schema_path = "graphql/linear-api.graphql",
     response_derives = "Debug, Clone, Serialize, Deserialize"
 )]
@@ -160,6 +160,7 @@ pub fn print(res: Result<Vec<Issue>>, json: bool, full_width: bool) {
             assignee,
             state,
             labels: _,
+            creator: _,
             ..
         } = issue;
 

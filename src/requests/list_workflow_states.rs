@@ -20,12 +20,3 @@ pub async fn request(client: &Client) -> Result<Vec<WorkflowState>> {
     let response = client.req::<_, list_workflow_states::ResponseData>(query).await?;
     Ok(response.workflow_states.nodes)
 }
-
-// #[builder]
-// pub async fn request(client: &Client) -> Result<Vec<list_workflow_states::ListWorkflowStatesTeamsNodes>> {
-//     // let variables = list_workflow_states::Variables { first: Some(100) };
-//     let variables = list_workflow_states::Variables;
-
-//     let response = client.req::<_, list_workflow_states::ResponseData>(variables).await?;
-//     Ok(response.teams.nodes)
-// }

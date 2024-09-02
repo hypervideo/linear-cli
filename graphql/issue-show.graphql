@@ -1,0 +1,59 @@
+query ShowIssue($issueId: String!) {
+  issue(id: $issueId) {
+    url
+    updatedAt
+    title
+    team {
+      name
+      key
+      id
+    }
+    assignee {
+      id
+      email
+      displayName
+    }
+    creator {
+      id
+      email
+      displayName
+    }
+    branchName
+    canceledAt
+    completedAt
+    createdAt
+    description
+    dueDate
+    estimate
+    id
+    identifier
+    labels {
+      nodes {
+        id
+        name
+      }
+    }
+    parent {
+      parent {
+        id
+        title
+        url
+        identifier
+      }
+    }
+    priority
+    priorityLabel
+    project {
+      name
+      id
+    }
+    startedAt
+    state {
+      id
+      name
+      type
+      position
+    }
+    trashed
+  }
+}

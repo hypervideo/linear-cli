@@ -1,10 +1,14 @@
 mutation IssueUpdate(
-  $id: ID!
-  input: IssueUpdateInput!
+  $id: String!
+  # $input: IssueUpdateInput!
+  $title: String
 ) {
   issueUpdate(
     id: $id
-    input: $input
+    # input: $input
+    input: {
+      title: $title
+    }
   ) {
     success
     issue {
