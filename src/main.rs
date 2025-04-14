@@ -60,7 +60,6 @@ enum Command {
         #[clap(subcommand)]
         cmd: IssueCommand,
     },
-
     Debug {
         #[clap(subcommand)]
         cmd: DebugCommand,
@@ -119,6 +118,9 @@ struct IssueShow {
 struct IssueList {
     #[clap(short, long = "limit")]
     n: Option<usize>,
+
+    #[clap(short, long, default_value = "100")]
+    page_size: usize,
 
     #[clap(short, long, default_value = "created")]
     sort_by: shared::SortBy,
@@ -230,6 +232,7 @@ async fn run(args: Args) -> color_eyre::Result<()> {
             cmd:
                 IssueCommand::List(IssueList {
                     n,
+                    page_size,
                     assignee,
                     sort_by,
                     state,
@@ -254,6 +257,7 @@ async fn run(args: Args) -> color_eyre::Result<()> {
                     .sort_by(sort_by)
                     .maybe_assignee(assignee)
                     .maybe_state(state)
+                    .page_size(page_size)
                     .call()
                     .await,
                 json,

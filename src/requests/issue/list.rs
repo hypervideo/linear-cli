@@ -23,9 +23,9 @@ pub async fn request(
     sort_by: SortBy,
     assignee: Option<String>,
     state: Option<Vec<IssueState>>,
+    page_size: usize,
 ) -> Result<Vec<Issue>> {
-    const PER_PAGE: usize = 100;
-    let per_page = n.map(|n| n.min(PER_PAGE)).unwrap_or(PER_PAGE);
+    let per_page = n.map(|n| n.min(page_size)).unwrap_or(page_size);
     let mut i = 0;
     let mut after = None;
     let mut result = Vec::new();
